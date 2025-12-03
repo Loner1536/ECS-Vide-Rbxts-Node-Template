@@ -14,32 +14,40 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
+      - name: Create CI-safe devcontainer.json (remove mounts)
+        run: |
+          echo "Creating CI-safe devcontainer.json without mounts..."
+          jq 'del(.mounts)' .devcontainer/devcontainer.json \
+            > .devcontainer/devcontainer.ci.json
+
+          echo "Sanitized config:"
+          cat .devcontainer/devcontainer.ci.json
+
       - name: Install Devcontainer CLI
         uses: devcontainers/ci@v0.3
         with:
           runCmd: echo "Devcontainer CLI ready"
 
-      - name: Build Devcontainer Image (CI override)
+      - name: Build Devcontainer Image
         run: |
           devcontainer build \
             --workspace-folder . \
-            --config .devcontainer/devcontainer.json \
-            --override-config .devcontainer/.workflows/devcontainer.json \
+            --config .devcontainer/devcontainer.ci.json \
             --image-name roblox-ts-template:ci
 
-      - name: Start Devcontainer & Test Tools
+      - name: Start Devcontainer (CI-safe)
         run: |
           devcontainer up \
             --workspace-folder . \
-            --config .devcontainer/devcontainer.json \
-            --override-config .devcontainer/.workflows/devcontainer.json \
-            --id-label test-container
+            --config .devcontainer/devcontainer.ci.json \
+            --id-label container=rbxts-ci
 
+      - name: Test Tools In Container
+        run: |
           devcontainer exec \
             --workspace-folder . \
-            --config .devcontainer/devcontainer.json \
-            --override-config .devcontainer/.workflows/devcontainer.json \
-            --id-label test-container \
+            --config .devcontainer/devcontainer.ci.json \
+            --id-label container=rbxts-ci \
             -- zsh -c "
               echo 'Checking tools…'
               zsh --version
@@ -47,7 +55,7 @@ jobs:
               bun --version
               git --version
               rokit --version
-              echo 'Running installs'
+              echo 'Installing dependencies…'
               rokit install --no-trust-check
               bun install
             "
