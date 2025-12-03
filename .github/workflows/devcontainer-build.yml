@@ -17,8 +17,7 @@ jobs:
       - name: Install Devcontainer CLI
         uses: devcontainers/ci@v0.3
         with:
-          runCmd: |
-            echo "Installed"
+          runCmd: echo "Devcontainer CLI installed"
 
       - name: Build Devcontainer Image
         uses: devcontainers/ci@v0.3
@@ -29,9 +28,21 @@ jobs:
 
       - name: Start Devcontainer & Test Tools
         uses: devcontainers/ci@v0.3
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
         with:
           configFile: .devcontainer/devcontainer.json
           runCmd: |
+            echo "Setting up SSH..."
+
+            mkdir -p ~/.ssh
+            echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_ed25519
+            chmod 600 ~/.ssh/id_ed25519
+
+            # Required for GitHub hosts
+            ssh-keyscan github.com >> ~/.ssh/known_hosts
+
+            echo "SSH setup complete"
             echo "Checking tools…"
             zsh --version
             node --version
