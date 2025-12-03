@@ -1,0 +1,47 @@
+name: Devcontainer Build Test
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+
+jobs:
+  build-devcontainer:
+    name: Build Dev Container
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Install Devcontainer CLI
+        uses: devcontainers/ci@v0.3
+        with:
+          runCmd: |
+            echo "Installed"
+
+      - name: Build Devcontainer Image
+        uses: devcontainers/ci@v0.3
+        with:
+          configFile: .devcontainer/devcontainer.json
+          imageName: roblox-ts-template:ci
+          cacheFrom: roblox-ts-template:ci
+
+      - name: Start Devcontainer & Test Tools
+        uses: devcontainers/ci@v0.3
+        with:
+          configFile: .devcontainer/devcontainer.json
+          runCmd: |
+            echo "Checking tools…"
+            zsh --version
+            node --version
+            bun --version
+            git --version
+            rokit --version
+
+            echo "Running postCreateCommand tasks…"
+            rokit install --no-trust-check
+            bun install
+
+      - name: Final confirmation
+        run: echo "Devcontainer build succeeded 🎉"
