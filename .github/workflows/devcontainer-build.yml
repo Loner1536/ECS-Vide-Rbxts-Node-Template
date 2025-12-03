@@ -17,42 +17,40 @@ jobs:
       - name: Install Devcontainer CLI
         uses: devcontainers/ci@v0.3
         with:
-          runCmd: echo "Devcontainer CLI installed"
+          runCmd: echo "Devcontainer CLI ready"
 
-      - name: Build Devcontainer Image
-        uses: devcontainers/ci@v0.3
-        with:
-          configFile: .devcontainer/devcontainer.json
-          imageName: roblox-ts-template:ci
-          cacheFrom: roblox-ts-template:ci
+      - name: Build Devcontainer Image (CI override)
+        run: |
+          devcontainer build \
+            --workspace-folder . \
+            --config .devcontainer/devcontainer.json \
+            --override-config .devcontainer/.workflows/devcontainer.json \
+            --image-name roblox-ts-template:ci
 
       - name: Start Devcontainer & Test Tools
-        uses: devcontainers/ci@v0.3
-        env:
-          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
-        with:
-          configFile: .devcontainer/devcontainer.json
-          runCmd: |
-            echo "Setting up SSH..."
+        run: |
+          devcontainer up \
+            --workspace-folder . \
+            --config .devcontainer/devcontainer.json \
+            --override-config .devcontainer/.workflows/devcontainer.json \
+            --id-label test-container
 
-            mkdir -p ~/.ssh
-            echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_ed25519
-            chmod 600 ~/.ssh/id_ed25519
-
-            # Required for GitHub hosts
-            ssh-keyscan github.com >> ~/.ssh/known_hosts
-
-            echo "SSH setup complete"
-            echo "Checking tools…"
-            zsh --version
-            node --version
-            bun --version
-            git --version
-            rokit --version
-
-            echo "Running postCreateCommand tasks…"
-            rokit install --no-trust-check
-            bun install
+          devcontainer exec \
+            --workspace-folder . \
+            --config .devcontainer/devcontainer.json \
+            --override-config .devcontainer/.workflows/devcontainer.json \
+            --id-label test-container \
+            -- zsh -c "
+              echo 'Checking tools…'
+              zsh --version
+              node --version
+              bun --version
+              git --version
+              rokit --version
+              echo 'Running installs'
+              rokit install --no-trust-check
+              bun install
+            "
 
       - name: Final confirmation
         run: echo "Devcontainer build succeeded 🎉"
