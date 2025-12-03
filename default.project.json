@@ -43,7 +43,11 @@
 			}
 		},
 		"ServerStorage": {
-			"$className": "ServerStorage"
+			"$className": "ServerStorage",
+
+			"stories": {
+				"$path": "out/src/stories"
+			}
 		},
 		"Workspace": {
 			"$className": "Workspace",

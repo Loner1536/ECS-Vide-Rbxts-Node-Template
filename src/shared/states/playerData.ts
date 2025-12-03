@@ -44,39 +44,35 @@ export default class PlayerData {
 	}
 
 	// Actions
-	public getState() {
-		return this.state;
-	}
-	public getProps(player: Player) {
-		if (RunService.IsServer()) {
-			return warn("[PlayerData] getProps should only be called on the client");
-		}
-
-		return {
-			gems: useAtom(() => this.state().get(tostring(player.UserId))?.gems ?? 0),
-		};
+	public getProps(player: Player): Types.PlayerData.Static {
+		return {} satisfies Types.PlayerData.Static;
 	}
 	public getStatic(userId: number): Types.PlayerData.Static {
 		const data = this.state().get(tostring(userId));
-		if (!data) return { gems: 0 };
+		if (!data) return {};
 
-		return {
-			gems: data.gems ?? 0,
-		};
+		return {} satisfies Types.PlayerData.Static;
 	}
 
 	// Core
-	public set(id: string, newData: Types.PlayerData.Static) {
+	public set(player: Player, newData: Types.PlayerData.Static) {
+		const id = tostring(player.UserId);
+
 		return this.state((state) => {
 			const newState = Object.deepCopy(state);
 			newState.set(id, newData);
 			return newState;
 		});
 	}
-	public update(id: string, updater: (data: Types.PlayerData.Static) => Types.PlayerData.Static) {
+	public update(
+		player: Player,
+		updater: (data: Types.PlayerData.Static) => Types.PlayerData.Static,
+	) {
 		if (RunService.IsClient() && RunService.IsRunning()) {
 			return warn("[PlayerData] update should only be called on the server");
 		}
+
+		const id = tostring(player.UserId);
 
 		this.state((state) => {
 			const newState = Object.deepCopy(state);
@@ -90,9 +86,11 @@ export default class PlayerData {
 			return newState;
 		});
 	}
-	public delete(id: string) {
+	public delete(player: Player) {
 		if (RunService.IsClient())
 			return warn("[PlayerData] delete should only be called on the server");
+
+		const id = tostring(player.UserId);
 
 		this.state((state) => {
 			const newState = Object.deepCopy(state);

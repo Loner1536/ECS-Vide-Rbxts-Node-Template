@@ -1,5 +1,4 @@
 // Imports
-import type { u32 } from "@rbxts/serio";
 import atoms from "./states/atoms";
 import Core from "./core";
 
@@ -9,9 +8,7 @@ declare namespace Types {
 	export type { Atoms };
 
 	export namespace PlayerData {
-		type Static = {
-			gems: u32;
-		};
+		type Static = {};
 	}
 
 	export namespace Core {

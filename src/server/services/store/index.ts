@@ -3,7 +3,7 @@ import { Players, RunService } from "@rbxts/services";
 
 // Packages
 import { MockDataStoreService, MockMemoryStoreService, createPlayerStore } from "@rbxts/lyra";
-import { Service, OnInit } from "@flamework/core";
+import { Service, OnInit, Flamework } from "@flamework/core";
 
 // Types
 import type Types from "@shared/types";
@@ -13,26 +13,35 @@ import safePlayerAdded from "@shared/utils/safePlayerAdded";
 
 // Components
 import template from "./template";
-import schema from "./schema";
 
 // Dependencies
 import CoreService from "../core";
 
+// Factories
+import PlayerFactory from "@server/factories/player";
+
 @Service({ loadOrder: 2 })
 export default class StoreService implements OnInit {
+	private Factory: Map<Player, PlayerFactory> = new Map();
+
 	constructor(private core: CoreService) {}
 
 	private store = createPlayerStore<Types.PlayerData.Static>({
 		name: "PlayerData",
 		template: template,
-		schema: schema,
+		schema: Flamework.createGuard<Types.PlayerData.Static>(),
 		dataStoreService: new MockDataStoreService(),
 		memoryStoreService: new MockMemoryStoreService(),
 		changedCallbacks: [
 			(userId, newData, _oldData) => {
 				const { S } = this.core;
 
-				S.playerData.update(tostring(userId), (data) => ({
+				const mockedPlayer = {
+					Name: "Lyra(Changed Callback)" + userId,
+					UserId: tonumber(userId),
+				} as Partial<Player> as Player;
+
+				S.playerData.update(mockedPlayer, (data) => ({
 					...data,
 					...newData,
 				}));
@@ -70,10 +79,12 @@ export default class StoreService implements OnInit {
 			try {
 				await this.store.loadAsync(player);
 
-				S.playerData.set(tostring(player.UserId), await this.store.get(player));
+				S.playerData.set(player, await this.store.get(player));
+
+				this.Factory.set(player, new PlayerFactory(player, this));
 
 				Promise.fromEvent(Players.PlayerRemoving, (left) => player === left)
-					.then(() => S.playerData.delete(tostring(player.UserId)))
+					.then(() => S.playerData.delete(player))
 					.then(() => this.store.unloadAsync(player));
 			} catch (error) {
 				this.handlePlayerDataError(player, error);
@@ -108,7 +119,10 @@ export default class StoreService implements OnInit {
 		}
 	}
 
-	public getPlayerDataStore(player: Player) {
-		return this.store.get(player);
+	public getFactory(player: Player) {
+		return this.Factory.get(player);
+	}
+	public getStore() {
+		return this.store;
 	}
 }
