@@ -13,13 +13,6 @@
 	"containerEnv": {
 		"NODE_ENV": "development"
 	},
-	"mounts": [
-		{
-			"source": "${localEnv:HOME}/.ssh",
-			"target": "/home/node/.ssh",
-			"type": "bind"
-		}
-	],
 	"customizations": {
 		"vscode": {
 			"settings": {
