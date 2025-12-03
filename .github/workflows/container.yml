@@ -19,8 +19,8 @@ jobs:
 
       # Build the devcontainer
       - name: Build Dev Container
-        run: devcontainer build --workspace-folder . --config .devcontainer/.workflows/devcontainer.json
+        run: devcontainer build --workspace-folder . --config .devcontainer/devcontainer.json
 
       # Run a command inside the built container
       - name: Run test command inside container
-        run: devcontainer exec --workspace-folder . --config .devcontainer/.workflows/devcontainer.json echo "Devcontainer OK"
+        run: devcontainer exec --workspace-folder . --config .devcontainer/devcontainer.json echo "Devcontainer OK"
