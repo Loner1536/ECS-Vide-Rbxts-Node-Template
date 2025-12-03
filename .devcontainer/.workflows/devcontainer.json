@@ -1,7 +1,7 @@
 {
-	"name": "Roblox-TS-Template",
+	"name": "Workflow-DevContainer",
 	"build": {
-		"dockerfile": "Dockerfile",
+		"dockerfile": "../Dockerfile",
 		"context": ".."
 	},
 	"postCreateCommand": "rokit install --no-trust-check",
