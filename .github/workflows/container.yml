@@ -13,14 +13,14 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v4
 
-      # Setup devcontainer CLI
       - name: Install Dev Container CLI
         run: npm install -g @devcontainers/cli
 
-      # Build the devcontainer
       - name: Build Dev Container
-        run: devcontainer build --workspace-folder . --config .devcontainer/devcontainer.json
+        run: devcontainer build --workspace-folder . --config .devcontainer/devcontainer.json --skip-mounts
 
-      # Run a command inside the built container
+      - name: Start Dev Container
+        run: devcontainer up --workspace-folder . --config .devcontainer/devcontainer.json --skip-mounts
+
       - name: Run test command inside container
-        run: devcontainer exec --workspace-folder . --config .devcontainer/devcontainer.json echo "Devcontainer OK"
+        run: devcontainer exec --workspace-folder . --config .devcontainer/devcontainer.json
