@@ -87,7 +87,6 @@ Desktop.ini
 # ==========================================
 *.swp
 *.swo
-*.patch
 *.diff
 
 # Turbo / pnpm
