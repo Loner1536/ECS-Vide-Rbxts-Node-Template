@@ -1,5 +1,5 @@
 {
-	"name": "Roblox-TS-Template",
+	"name": "Change-Name-Template",
 	"build": {
 		"dockerfile": "Dockerfile",
 		"context": ".."
