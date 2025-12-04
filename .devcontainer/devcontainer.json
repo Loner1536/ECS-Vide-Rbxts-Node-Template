@@ -42,7 +42,7 @@
 					"**/network/**"
 				],
 				"terminal.integrated.fontFamily": "'Monaspace Radon Frozen', 'FiraCode Nerd Font'",
-				"typescript.preferences.importModuleSpecifier": "relative",
+				"typescript.preferences.importModuleSpecifier": "shortest",
 				"terminal.integrated.defaultProfile.linux": "zsh",
 				"jest.jestCommandLine": "bun run test:local --",
 				"todo-tree.tree.scanMode": "workspace",
