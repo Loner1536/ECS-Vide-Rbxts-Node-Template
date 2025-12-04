@@ -8,7 +8,8 @@
 		"build": "rojo build -o ./release.rbxlx",
 		"compile": "rbxtsc -p ./src -i ./out/include",
 		"watch": "rbxtsc -p ./src -i ./out/include -w",
-		"dev": "concurrently \"rojo serve\" \"turbo run watch\""
+		"dev": "concurrently \"rojo serve\" \"turbo run watch\"",
+		"postinstall": "patch-package"
 	},
 	"dependencies": {
 		"@flamework/components": "^1.3.2",
