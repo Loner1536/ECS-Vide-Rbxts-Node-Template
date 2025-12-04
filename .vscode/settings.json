@@ -5,12 +5,12 @@
 		"**/*-lock.*": true,
 		"**/*.lock": true,
 
-		// "**/patches": true,
+		"**/patches": true,
 		"**/.turbo": true,
 
 		"**/out": true,
 
-		".gitattributes": true
-		// ".gitignore": true
+		".gitattributes": true,
+		".gitignore": true
 	}
 }
