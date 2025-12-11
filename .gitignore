@@ -51,6 +51,7 @@ types/
 .env
 .env.*
 !.env.example
+!.env.template
 
 # ==========================================
 # OS Files
