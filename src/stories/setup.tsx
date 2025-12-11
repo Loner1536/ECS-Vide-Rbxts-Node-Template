@@ -1,7 +1,7 @@
 // Packages
-import AppForge, { Render, type NameProps } from "@rbxts/app-forge";
-import React, { useMemo } from "@rbxts/react";
+import { CreateVideForge, RenderVide, type NameProps } from "@rbxts/app-forge";
 import { Flamework } from "@flamework/core";
+import Vide from "@rbxts/vide";
 
 // Types
 import type { InferProps } from "@rbxts/ui-labs";
@@ -22,15 +22,15 @@ const mockedPlayer = {
 Flamework.addPaths("src/shared/apps");
 
 type SetupProps<T extends InferProps<{}>> = {
-	callback: (props: AppProps, Forge: AppForge) => void;
+	callback: (props: AppProps, Forge: CreateVideForge) => void;
 	storyProps: T;
 } & NameProps;
 
 export default function Setup<T extends InferProps<{}>>(setupProps: SetupProps<T>) {
 	const { names, name, callback, storyProps } = setupProps;
 
-	const coreController = useMemo(() => new CoreController(), []);
-	const appController = useMemo(() => new AppController(coreController), []);
+	const coreController = new CoreController();
+	const appController = new AppController(coreController);
 
 	const props = appController.createProps(mockedPlayer);
 	const target = storyProps.target;
@@ -39,7 +39,7 @@ export default function Setup<T extends InferProps<{}>>(setupProps: SetupProps<T
 
 	S.playerData.set(mockedPlayer, playerDataTemplate);
 
-	const forge = new AppForge();
+	const forge = new CreateVideForge();
 
 	task.defer(() => callback(props, forge));
 
@@ -47,5 +47,5 @@ export default function Setup<T extends InferProps<{}>>(setupProps: SetupProps<T
 
 	const mainProps = { props, forge, target, appNames };
 
-	return <Render {...mainProps} />;
+	return <RenderVide {...mainProps} />;
 }

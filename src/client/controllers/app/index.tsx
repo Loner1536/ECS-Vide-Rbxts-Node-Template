@@ -1,11 +1,10 @@
 // Services
-import { Players, RunService, Workspace } from "@rbxts/services";
+import { Players } from "@rbxts/services";
 
 // Packages
-import { createPortal, createRoot } from "@rbxts/react-roblox";
-import AppForge, { MainProps, Render } from "@rbxts/app-forge";
+import { CreateVideForge, RenderVide } from "@rbxts/app-forge";
 import { Controller, OnInit } from "@flamework/core";
-import React, { StrictMode } from "@rbxts/react";
+import Vide, { mount } from "@rbxts/vide";
 
 // Controller
 import CoreController from "../core";
@@ -16,31 +15,17 @@ export default class AppController implements OnInit {
 
 	onInit() {
 		const props = this.createProps(Players.LocalPlayer!);
-		const forge = new AppForge();
+		const forge = new CreateVideForge();
 
-		const root = createRoot(new Instance("Folder"));
-		const target = Workspace.CurrentCamera!;
+		const target = Players.LocalPlayer.WaitForChild("PlayerGui");
 
-		function RenderApp({ props, forge, target }: MainProps) {
+		mount(() => {
 			return (
-				<screengui key="App" ZIndexBehavior="Sibling" ResetOnSpawn={false}>
-					<Render {...{ props, forge, target }} />
+				<screengui Name={"App"} ZIndexBehavior="Sibling" ResetOnSpawn={false}>
+					<RenderVide {...{ props, forge }} />
 				</screengui>
 			);
-		}
-
-		root.render(
-			createPortal(
-				RunService.IsStudio() ? (
-					<StrictMode>
-						<RenderApp props={props} forge={forge} target={target} />
-					</StrictMode>
-				) : (
-					<RenderApp props={props} forge={forge} target={target} />
-				),
-				Players.LocalPlayer!.WaitForChild("PlayerGui"),
-			),
-		);
+		}, target);
 	}
 
 	public createProps(player: Player) {
