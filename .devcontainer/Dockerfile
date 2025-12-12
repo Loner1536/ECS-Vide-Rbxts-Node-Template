@@ -2,7 +2,7 @@
 FROM debian:trixie-slim
 
 ENV DEBIAN_FRONTEND=noninteractive
-ENV HOME=/home/node
+ENV HOME=/home/root
 ENV ZSH_CUSTOM=$HOME/.oh-my-zsh/custom
 ENV BUN_INSTALL=$HOME/.bun
 ENV PATH="$BUN_INSTALL/bin:$HOME/.rokit/bin:/workspaces/TS-UILib/node_modules/.bin:$PATH"
@@ -15,12 +15,15 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && apt-get install -y nodejs \
     && rm -rf /var/lib/apt/lists/* \
     && update-ca-certificates \
-    && useradd -m -s /bin/zsh node \
-    && echo "node ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers \
-    && chown -R node:node /home/node
+    && mkdir -p /home/root \
+    && echo "root ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers \
+    && chown -R root:root /home/root
+
+# Ensure shell for root
+RUN chsh -s /bin/zsh root
 
 # ---------------- User ----------------
-USER node
+USER root
 WORKDIR $HOME
 
 # ---------------- Oh My Zsh + Powerlevel10k ----------------
@@ -36,7 +39,7 @@ RUN git clone --depth=1 https://github.com/ohmyzsh/ohmyzsh.git $HOME/.oh-my-zsh 
     && echo 'alias p10k="zsh -i -c '\''source ~/.p10k.zsh && p10k configure'\''"' >> $HOME/.zshrc
 
 # Copy preconfigured .p10k.zsh
-COPY --chown=node:node .devcontainer/.config/.p10k.zsh $HOME/.p10k.zsh
+COPY --chown=root:root .devcontainer/.config/.p10k.zsh $HOME/.p10k.zsh
 
 # ---------------- Bun ----------------
 RUN curl -fsSL https://bun.sh/install | bash \
@@ -46,7 +49,7 @@ RUN curl -fsSL https://bun.sh/install | bash \
 RUN curl -fsSL https://raw.githubusercontent.com/rojo-rbx/rokit/main/scripts/install.sh | bash
 
 # Add to PATH
-ENV PATH="/home/node/.rokit/bin:${PATH}"
+ENV PATH="/home/root/.rokit/bin:${PATH}"
 
 # ---------------- Fix Zsh paste & tab ----------------
 RUN echo '# Fix paste duplication from autosuggestions' >> $HOME/.zshrc \
@@ -56,9 +59,6 @@ RUN echo '# Fix paste duplication from autosuggestions' >> $HOME/.zshrc \
     && echo 'zle -N zle_bracketed_paste_end' >> $HOME/.zshrc \
     && echo '# Fix tab completion' >> $HOME/.zshrc \
     && echo 'bindkey "^I" expand-or-complete' >> $HOME/.zshrc
-
-# ---------------- Workdir ----------------
-WORKDIR /workspaces/TS-UILib
 
 # ---------------- Healthcheck ----------------
 HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \

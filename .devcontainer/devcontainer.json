@@ -1,5 +1,5 @@
 {
-    "name": "Change-Name-Template",
+    "name": "Learning-Project",
     "build": {
         "dockerfile": "Dockerfile",
         "context": ".."
@@ -8,7 +8,7 @@
     "shutdownAction": "stopContainer",
     "updateRemoteUserUID": false,
     "overrideCommand": true,
-    "remoteUser": "node",
+    "remoteUser": "root",
     "init": true,
     "containerEnv": {
         "NODE_ENV": "development"
@@ -16,7 +16,7 @@
     "mounts": [
         {
             "source": "${localEnv:HOME}/.ssh",
-            "target": "/home/node/.ssh",
+            "target": "/home/root/.ssh",
             "type": "bind"
         }
     ],
