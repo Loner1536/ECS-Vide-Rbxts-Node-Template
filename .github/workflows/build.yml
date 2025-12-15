@@ -1,4 +1,4 @@
-name: Test Build
+name: Test
 
 on:
   push:
@@ -25,11 +25,7 @@ jobs:
 
       # Build container (this installs ALL deps defined in Dockerfile)
       - name: Build Dev Container
-        run: |
-            devcontainer build \
-            --workspace-folder . \
-            --config .devcontainer/devcontainer.json
-
+        run: devcontainer build --workspace-folder . --config .devcontainer/devcontainer.json
 
       # Start container
       - name: Start Dev Container
