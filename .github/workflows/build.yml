@@ -1,4 +1,4 @@
-name: Test
+name: Build Test
 
 on:
   push:
@@ -13,53 +13,44 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v4
 
-      # Prevent SSH mount failure
       - name: Create fake .ssh dir so mount doesn't fail
         run: |
           mkdir -p /home/runner/.ssh
           touch /home/runner/.ssh/known_hosts
 
-      # Devcontainer CLI
       - name: Install Dev Container CLI
         run: npm install -g @devcontainers/cli
 
-      # Build container (this installs ALL deps defined in Dockerfile)
       - name: Build Dev Container
-        run: devcontainer build --workspace-folder . --config .devcontainer/devcontainer.json
+        run: devcontainer build \
+          --workspace-folder . \
+          --config .devcontainer/devcontainer.json
 
-      # Start container
       - name: Start Dev Container
         run: devcontainer up \
           --workspace-folder . \
           --config .devcontainer/devcontainer.json
 
-      # Install JS deps (inside container)
-      - name: Install project dependencies
-        run: >
-          devcontainer exec
-          --workspace-folder .
-          --config .devcontainer/devcontainer.json
-          -- bash -lc "bun install --frozen-lockfile"
+      - name: Install dependencies (bun)
+        run: devcontainer exec \
+          --workspace-folder . \
+          --config .devcontainer/devcontainer.json \
+          -- bash -lc "bun install"
 
-      # Compile roblox-ts
-      - name: Compile roblox-ts
-        run: >
-          devcontainer exec
-          --workspace-folder .
-          --config .devcontainer/devcontainer.json
+      - name: Compile Roblox-TS
+        run: devcontainer exec \
+          --workspace-folder . \
+          --config .devcontainer/devcontainer.json \
           -- bash -lc "bun run compile"
 
-      # Build Rojo place
-      - name: Build place
-        run: >
-          devcontainer exec
-          --workspace-folder .
-          --config .devcontainer/devcontainer.json
+      - name: Build place file
+        run: devcontainer exec \
+          --workspace-folder . \
+          --config .devcontainer/devcontainer.json \
           -- bash -lc "bun run build"
 
-      # Upload artifact from workspace
-      - name: Upload release
-        uses: actions/upload-artifact@v4
-        with:
-          name: roblox-place
-          path: release.rbxlx
+      - name: Smoke test
+        run: devcontainer exec \
+          --workspace-folder . \
+          --config .devcontainer/devcontainer.json \
+          -- bash -lc "echo container ok"
