@@ -22,35 +22,38 @@ jobs:
         run: npm install -g @devcontainers/cli
 
       - name: Build Dev Container
-        run: devcontainer build \
-          --workspace-folder . \
-          --config .devcontainer/devcontainer.json
+        run: devcontainer build --workspace-folder . --config .devcontainer/devcontainer.json
 
       - name: Start Dev Container
-        run: devcontainer up \
-          --workspace-folder . \
-          --config .devcontainer/devcontainer.json
+        run: |
+          devcontainer up \
+            --workspace-folder . \
+            --config .devcontainer/devcontainer.json
 
       - name: Install dependencies (bun)
-        run: devcontainer exec \
-          --workspace-folder . \
-          --config .devcontainer/devcontainer.json \
-          -- bash -lc "bun install"
+        run: |
+          devcontainer exec \
+            --workspace-folder . \
+            --config .devcontainer/devcontainer.json \
+            -- bash -lc "bun install"
 
       - name: Compile Roblox-TS
-        run: devcontainer exec \
-          --workspace-folder . \
-          --config .devcontainer/devcontainer.json \
-          -- bash -lc "bun run compile"
+        run: |
+          devcontainer exec \
+            --workspace-folder . \
+            --config .devcontainer/devcontainer.json \
+            -- bash -lc "bun run compile"
 
       - name: Build place file
-        run: devcontainer exec \
-          --workspace-folder . \
-          --config .devcontainer/devcontainer.json \
-          -- bash -lc "bun run build"
+        run: |
+          devcontainer exec \
+            --workspace-folder . \
+            --config .devcontainer/devcontainer.json \
+            -- bash -lc "bun run build"
 
       - name: Smoke test
-        run: devcontainer exec \
-          --workspace-folder . \
-          --config .devcontainer/devcontainer.json \
-          -- bash -lc "echo container ok"
+        run: |
+          devcontainer exec \
+            --workspace-folder . \
+            --config .devcontainer/devcontainer.json \
+            -- bash -lc "echo container ok"
