@@ -2,9 +2,9 @@
 import { Players } from "@rbxts/services";
 
 // Packages
-import { CreateVideForge, RenderVide } from "@rbxts/app-forge";
 import { Controller, OnInit } from "@flamework/core";
-import Vide, { mount } from "@rbxts/vide";
+import { CreateVideForge } from "@rbxts/app-forge";
+import Vide from "@rbxts/vide";
 
 // Controller
 import CoreController from "../core";
@@ -19,13 +19,11 @@ export default class AppController implements OnInit {
 
 		const target = Players.LocalPlayer.WaitForChild("PlayerGui");
 
-		mount(() => {
-			return (
-				<screengui Name={"App"} ZIndexBehavior="Sibling" ResetOnSpawn={false}>
-					<RenderVide {...{ props, forge }} />
-				</screengui>
-			);
-		}, target);
+		forge.mount(
+			() => <screengui Name={"App"} ZIndexBehavior="Sibling" ResetOnSpawn={false} />,
+			{ ...{ props, forge } },
+			target,
+		);
 	}
 
 	public createProps(player: Player) {

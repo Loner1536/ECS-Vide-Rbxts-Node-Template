@@ -1,5 +1,5 @@
 // Packages
-import { CreateVideForge, RenderVide, type NameProps } from "@rbxts/app-forge";
+import { CreateVideForge, VideRenderProps, type VideProps } from "@rbxts/app-forge";
 import { Flamework } from "@flamework/core";
 import Vide from "@rbxts/vide";
 
@@ -24,16 +24,32 @@ Flamework.addPaths("src/shared/apps");
 type SetupProps<T extends InferProps<{}>> = {
 	callback: (props: AppProps, Forge: CreateVideForge) => void;
 	storyProps: T;
-} & NameProps;
+} & VideRenderProps;
+
+function buildRender({
+	name,
+	names,
+	group,
+}: Pick<VideRenderProps, "name" | "names" | "group">): VideRenderProps | undefined {
+	if (group) {
+		if (name) return { name, group };
+		if (names) return { names, group };
+		return { group };
+	}
+
+	if (name) return { name };
+	if (names) return { names };
+
+	return undefined;
+}
 
 export default function Setup<T extends InferProps<{}>>(setupProps: SetupProps<T>) {
-	const { names, name, callback, storyProps } = setupProps;
+	const { callback, storyProps, name, names, group } = setupProps;
 
 	const coreController = new CoreController();
 	const appController = new AppController(coreController);
 
 	const props = appController.createProps(mockedPlayer);
-	const target = storyProps.target;
 
 	const { S } = coreController;
 
@@ -41,11 +57,17 @@ export default function Setup<T extends InferProps<{}>>(setupProps: SetupProps<T
 
 	const forge = new CreateVideForge();
 
-	task.defer(() => callback(props, forge));
+	callback(props, forge);
 
-	const appNames = name ? name : names;
+	const config: VideProps["config"] = {
+		px: {
+			target: storyProps.target,
+		},
+	};
 
-	const mainProps = { props, forge, target, appNames };
+	const defProps: VideProps = { props, forge, config };
+	const render = buildRender({ name, names, group });
 
-	return <RenderVide {...mainProps} />;
+	const mainProps: VideProps = { ...defProps, render };
+	return forge.story(mainProps);
 }
