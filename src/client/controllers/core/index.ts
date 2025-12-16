@@ -1,5 +1,9 @@
+// Services
+import { ContextActionService } from "@rbxts/services";
+
 // Packages
 import { Controller, OnInit, OnStart } from "@flamework/core";
+import jabby from "@rbxts/jabby";
 
 // Types
 import type Types from "@shared/types";
@@ -30,6 +34,14 @@ export default class CoreController implements OnInit, OnStart, Types.Core.API {
 
 	onInit() {
 		this.S.Init();
+
+		const client = jabby.obtain_client();
+
+		function createWidget(_: string, state: Enum.UserInputState) {
+			if (state !== Enum.UserInputState.Begin) return;
+			client.spawn_app(client.apps.home);
+		}
+		ContextActionService.BindAction("Open Jabby Home", createWidget, false, Enum.KeyCode.F3);
 	}
 
 	onStart() {
